@@ -48,6 +48,14 @@ The API Gateway endpoint API will be displayed in the outputs when the deploymen
 
 ## Use the AWS SAM CLI to build and test locally
 
+NOTE: To test your app locally you need to have an instance of dynamoDB working in your local. You can do it with a docker container:
+
+```bash
+my-application$ docker run -d -p 8000:8000 --network=local-api-network --name dynamo-local amazon/dynamodb-local
+```
+
+It's important to set a network and a name to the container to be able to make requests from the serverless-app container
+
 Build your application by using the `sam build` command.
 
 ```bash
@@ -61,17 +69,19 @@ Test a single function by invoking it directly with a test event. An event is a 
 Run functions locally and invoke them with the `sam local invoke` command.
 
 ```bash
-my-application$ sam local invoke putItemFunction --event events/event-post-item.json
-my-application$ sam local invoke getAllItemsFunction --event events/event-get-all-items.json
+my-application$ sam local invoke putItemFunction --event events/event-post-item.json --docker-network local-api-network
+my-application$ sam local invoke getAllItemsFunction --event events/event-get-all-items.json --docker-network local-api-network
 ```
 
 The AWS SAM CLI can also emulate your application's API. Use the `sam local start-api` command to run the API locally on port 3000.
 
 ```bash
 my-application$ docker run -d -p 8000:8000 --network=local-api-network --name dynamo-local amazon/dynamodb-local
-my-application$ sam local start-api
+my-application$ sam local start-api --docker-network local-api-network
 my-application$ curl http://localhost:3000/
 ```
+
+Look at that all `sam local` commands have a docker-network parameter to be the same than dynamoDB container.
 
 The AWS SAM CLI reads the application template to determine the API's routes and the functions that they invoke. The `Events` property on each function's definition includes the route and method for each path.
 

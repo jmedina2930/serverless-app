@@ -3,7 +3,6 @@
 // set env config to AWS
 const AWS = require("aws-sdk");
 AWS.config.update({
-  //   region: "local",
   endpoint: "http://dynamo-local:8000",
 });
 // Create a DocumentClient that represents the query to add an item
